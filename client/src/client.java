@@ -15,55 +15,71 @@ public class client {
         BufferedReader bufferedReader = null;
         BufferedWriter bufferedWriter = null;
 
-        try{
-
-            socket = new Socket("localhost",1234);
+        try {
+            socket = new Socket("localhost", 1234);
 
             inputStreamReader = new InputStreamReader(socket.getInputStream());
             outputStreamWriter = new OutputStreamWriter(socket.getOutputStream());
 
             bufferedReader = new BufferedReader(inputStreamReader);
+            final BufferedReader finalBufferedReader = bufferedReader; 
+
             bufferedWriter = new BufferedWriter(outputStreamWriter);
 
-            Scanner scanner = new Scanner(System.in);
+            Scanner nameScanner = new Scanner(System.in);
+            System.out.println("name: ");
+            String Clientname = nameScanner.nextLine();
+            bufferedWriter.write(Clientname);
+            bufferedWriter.newLine();
+            bufferedWriter.flush();
 
+            Thread receiveThread = new Thread(() -> {
+                String msgFromServer;
+                try {
+                    while ((msgFromServer = finalBufferedReader.readLine()) != null) {
+                        System.out.println(msgFromServer);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+            receiveThread.start();
+
+            Scanner scanner = new Scanner(System.in);
             while (true) {
                 String msgToSend = scanner.nextLine();
                 bufferedWriter.write(msgToSend);
                 bufferedWriter.newLine();
                 bufferedWriter.flush();
 
-                System.out.println("server:"+bufferedReader.readLine());
 
-                if(msgToSend.equalsIgnoreCase("bye")){
+                if (msgToSend.equalsIgnoreCase("bye")) {
                     break;
                 }
             }
-        }
-        catch (IOException e){
-                e.printStackTrace();
-        }
-        finally{
-            try{
-                if(socket != null){
-                    socket.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (socket != null) {
+                socket.close();
                 }
                 if(inputStreamReader != null){
                     inputStreamReader.close();
                 }
-                if(outputStreamWriter != null){
+                if (outputStreamWriter != null) {
                     outputStreamWriter.close();
                 }
-                if(bufferedReader != null){
+                if (bufferedReader != null) {
                     bufferedReader.close();
                 }
-                if(bufferedWriter != null){
+                if (bufferedWriter != null) {
                     bufferedWriter.close();
                 }
-            }
-            catch(IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
-            }   
+            }
         }
     }
 }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
